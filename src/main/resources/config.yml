@@ -1,0 +1,4 @@
+# Clan Tournament Configuration
+land-protection-enabled: true
+max-claim-size: 100
+allow-creeper-grief: true
