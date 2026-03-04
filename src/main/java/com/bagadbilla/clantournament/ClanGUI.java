@@ -91,6 +91,21 @@ public class ClanGUI implements Listener {
             i++;
         }
 
+        // Vitals Button - Slot 11
+        ItemStack vitals = new ItemStack(Material.GLISTERING_MELON_SLICE);
+	ItemMeta vMeta = vitals.getItemMeta();
+	if (vMeta != null) {
+  	    vMeta.setDisplayName("§a§lClan Vitals");
+    	    List<String> vLore = new ArrayList<>();
+    	    vLore.add("§7Check health, hunger, and");
+    	    vLore.add("§7location of all teammates.");
+    	    vLore.add("");
+    	    vLore.add("§eClick to view!");
+    	    vMeta.setLore(vLore);
+    	    vitals.setItemMeta(vMeta);
+	}
+	gui.setItem(11, vitals);
+
         // --- 5. LEAVE BUTTON (Slot 53) ---
         // If leader, show barrier (can't leave). If member, show red bed.
         if (clan.getLeader().equals(player.getUniqueId())) {
@@ -138,17 +153,22 @@ public class ClanGUI implements Listener {
         player.openInventory(confirm);
     }
 
-    @EventHandler
+@EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (event.getCurrentItem() == null) return;
         String title = event.getView().getTitle();
         Player player = (Player) event.getWhoClicked();
+        Material clickedType = event.getCurrentItem().getType();
 
         // Match the Main Menu
         if (title.contains("»")) {
             event.setCancelled(true);
             if (event.getCurrentItem().getType() == Material.RED_BED) {
                 openConfirmMenu(player);
+            }
+            else if (clickedType == Material.GLISTERING_MELON_SLICE) {
+                player.closeInventory();
+                player.performCommand("clan vitals");
             }
         }
 

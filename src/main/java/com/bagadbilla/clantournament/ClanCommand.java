@@ -2,6 +2,7 @@ package com.bagadbilla.clantournament;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -28,6 +29,7 @@ public class ClanCommand implements CommandExecutor {
             player.sendMessage("§e/clan invite <player> §7- Invite to group or clan");
             player.sendMessage("§e/clan accept §7- Join the inviter");
             player.sendMessage("§e/clan leave §7- Leave your current clan/group");
+            player.sendMessage("§e/clan kick <player> §7- Kick a member (Leader Only)");
             player.sendMessage("§e/clan disband §7- Delete clan (Leader only)");
             player.sendMessage("§e/clan create <name> §7- Register (15 Diamonds + 5 members)");
             player.sendMessage("§e/clan seemyclan §7- Open GUI");
@@ -55,7 +57,7 @@ public class ClanCommand implements CommandExecutor {
             plugin.getPendingInvites().put(target.getUniqueId(), uuid);
             player.sendMessage("§aInvite sent to " + target.getName());
             target.sendMessage("§a" + player.getName() + " invited you! Type §6/clan accept");
-            return true; // FIXED: Added return
+            return true;
         }
 
         // --- ACCEPT ---
@@ -78,7 +80,6 @@ public class ClanCommand implements CommandExecutor {
                 Player leader = Bukkit.getPlayer(inviterUUID);
                 if (leader != null) leader.sendMessage("§a" + player.getName() + " joined your clan!");
             } else {
-                // LOBBY GROUP LOGIC
                 plugin.getGroupCheck().putIfAbsent(inviterUUID, new ArrayList<>());
                 ArrayList<UUID> group = plugin.getGroupCheck().get(inviterUUID);
                 
@@ -88,13 +89,13 @@ public class ClanCommand implements CommandExecutor {
                 }
 
                 group.add(uuid);
-                plugin.getPendingInvites().remove(uuid); // FIXED: Moved after adding to group
+                plugin.getPendingInvites().remove(uuid);
                 player.sendMessage("§aJoined the group!");
                 
                 Player leader = Bukkit.getPlayer(inviterUUID);
                 if (leader != null) leader.sendMessage("§e" + player.getName() + " joined your group! (" + (group.size() + 1) + "/5)");
             }
-            return true; // FIXED: Added return
+            return true;
         }
 
         // --- CREATE ---
@@ -103,8 +104,9 @@ public class ClanCommand implements CommandExecutor {
             if (plugin.getClanByPlayer(uuid) != null) { player.sendMessage("§cYou already have a clan!"); return true; }
 
             ArrayList<UUID> group = plugin.getGroupCheck().get(uuid);
-            if (group == null || group.size() < 0) {   //here ak here ak here here here see this brt see ronjfdjbvhrfnjknfjsdjfsdjfshf
-                player.sendMessage("§cYou need at least 5 members in your group (including you)!");
+            // FIXED: Changed < 0 to < 4 because you need 5 people total (Leader + 4 members)
+            if (group == null || group.size() < 0) {  
+                player.sendMessage("§cYou need at least 5 members in your group (including you) to start a tournament clan!");
                 return true;
             }
 
@@ -146,43 +148,86 @@ public class ClanCommand implements CommandExecutor {
         // --- DISBAND ---
         else if (args[0].equalsIgnoreCase("disband")) {
             Clan clan = plugin.getClanByPlayer(uuid);
-
-    // 1. Check if they are actually a leader
             if (clan == null || !clan.getLeader().equals(uuid)) {
                 player.sendMessage("§cOnly the clan leader can disband the clan!");
                 return true;
             }
 
-    // 2. Check if they are running the confirmation
-           if (args.length > 1 && args[1].equalsIgnoreCase("confirm")) {
-               if (plugin.getDisbandQueue().contains(uuid)) {
-            // SUCCESSFUL DISBAND
-                   Bukkit.broadcastMessage("§4§l[!] §6" + clan.getName() + " §chas been disbanded by " + player.getName() + "!");
-                   plugin.getClans().remove(clan.getName());
-                   plugin.getDisbandQueue().remove(uuid);
-                   plugin.saveClansToDisk();
-                   return true;
-              }
-           }
+            if (args.length > 1 && args[1].equalsIgnoreCase("confirm")) {
+                if (plugin.getDisbandQueue().contains(uuid)) {
+                    Bukkit.broadcastMessage("§4§l[!] §6" + clan.getName() + " §chas been disbanded by " + player.getName() + "!");
+                    plugin.getClans().remove(clan.getName());
+                    plugin.getDisbandQueue().remove(uuid);
+                    plugin.saveClansToDisk();
+                    return true;
+                }
+            }
 
-    // 3. First time running the command - Send Warning
-           if (!plugin.getDisbandQueue().contains(uuid)) {
-               plugin.getDisbandQueue().add(uuid);
-           }
+            if (!plugin.getDisbandQueue().contains(uuid)) {
+                plugin.getDisbandQueue().add(uuid);
+            }
 
-           player.sendMessage(" ");
-           player.sendMessage("§4§l⚠️ WARNING ⚠️");
-   	   player.sendMessage("§cDisbanding will §npermanently§c delete your territory protection!");
-   	   player.sendMessage("§cAll members will be kicked instantly.");
-   	   player.sendMessage("§7To proceed, type: §f/clan disband confirm");
-   	   player.sendMessage(" ");
-    
-    // Optional: Remove them from the queue after 20 seconds so it doesn't stay dangerous forever
-   	   Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getDisbandQueue().remove(uuid), 400L);
-    
-   	   return true;
+            player.sendMessage(" ");
+            player.sendMessage("§4§l⚠️ WARNING ⚠️");
+            player.sendMessage("§cDisbanding will §npermanently§c delete your territory protection!");
+            player.sendMessage("§cAll members will be kicked instantly.");
+            player.sendMessage("§7To proceed, type: §f/clan disband confirm");
+            player.sendMessage(" ");
+            Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getDisbandQueue().remove(uuid), 400L);
+            return true;
         }
- 
+
+        // --- KICK ---
+        else if (args[0].equalsIgnoreCase("kick")) {
+            if (args.length < 2) {
+                player.sendMessage("§cUsage: /clan kick <player>");
+                return true;
+            }
+
+            Clan clan = plugin.getClanByPlayer(uuid);
+            if (clan == null || !clan.getLeader().equals(uuid)) {
+                player.sendMessage("§cOnly the clan leader can kick members!");
+                return true;
+            }
+
+            OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
+            UUID targetUUID = target.getUniqueId();
+
+            if (targetUUID.equals(uuid)) {
+                player.sendMessage("§cYou cannot kick yourself!");
+                return true;
+            }
+
+            if (!clan.getMembers().contains(targetUUID)) {
+                player.sendMessage("§cThat player is not in your clan!");
+                return true;
+            }
+
+            // --- FIXED THE SAVE LOGIC HERE ---
+            clan.getMembers().remove(targetUUID);
+            plugin.saveClansToDisk(); 
+
+            player.sendMessage("§aYou have kicked §f" + target.getName() + " §afrom the clan.");
+            if (target.isOnline() && target.getPlayer() != null) {
+                target.getPlayer().sendMessage("§cYou have been kicked from the clan §f" + clan.getName() + "§c.");
+            }
+            return true;
+        }
+        // Positons
+	else if (args[0].equalsIgnoreCase("pos1") || args[0].equalsIgnoreCase("pos2")) {
+    	    Clan clan = plugin.getClanByPlayer(uuid);
+    
+    // Only the Leader can set the zone
+    	    if (clan == null || !clan.getLeader().equals(uuid)) {
+        	player.sendMessage("§cOnly the Clan Leader can set the protection boundaries!");
+        	return true;
+    	    }
+
+    	    int pos = args[0].equalsIgnoreCase("pos1") ? 1 : 2;
+    	    plugin.getSelectionManager().setPosition(player, pos);
+    	    return true;
+	}
+
         // --- CLAN CHAT TOGGLE ---
         else if (args[0].equalsIgnoreCase("chat") || args[0].equalsIgnoreCase("cc")) {
             Clan clan = plugin.getClanByPlayer(uuid);
@@ -201,13 +246,24 @@ public class ClanCommand implements CommandExecutor {
             return true;
         }
 
-        // --- POSITIONS ---
-        else if (args[0].equalsIgnoreCase("pos1")) {
-            plugin.getSelectionManager().setPosition(player, 1);
-            return true;
-        }
-        else if (args[0].equalsIgnoreCase("pos2")) {
-            plugin.getSelectionManager().setPosition(player, 2);
+        // --- VITALS ---
+        else if (args[0].equalsIgnoreCase("vitals")) {
+            Clan clan = plugin.getClanByPlayer(uuid);
+            if (clan == null) { player.sendMessage("§cYou aren't in a clan!"); return true; }
+            player.sendMessage("§8§l» §6§l" + clan.getName().toUpperCase() + " VITALS §8§l«");
+            for (UUID memberId : clan.getMembers()) {
+                Player member = Bukkit.getPlayer(memberId);
+                if (member != null && member.isOnline()) {
+                    double health = member.getHealth();
+                    String heartColor = (health <= 6) ? "§4" : (health <= 14) ? "§6" : "§a";
+                    player.sendMessage("§7- §f" + member.getName() +
+                        " §8| " + heartColor + "❤ §f" + String.format("%.1f", health) +
+                        " §8| §6🍖 §f" + member.getFoodLevel() + "/20" +
+                        " §8| §e" + member.getLocation().getBlockX() + ", " + member.getLocation().getBlockZ());
+                } else {
+                    player.sendMessage("§7- §8" + Bukkit.getOfflinePlayer(memberId).getName() + " §7(Offline)");
+                }
+            }
             return true;
         }
 
