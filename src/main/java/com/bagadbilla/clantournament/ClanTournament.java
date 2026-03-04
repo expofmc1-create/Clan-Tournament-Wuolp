@@ -10,6 +10,9 @@ import java.util.HashMap;
 import java.util.UUID;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.UUID;
 
 public class ClanTournament extends JavaPlugin {
 
@@ -17,7 +20,8 @@ public class ClanTournament extends JavaPlugin {
     private HashMap<UUID, UUID> pendingInvites = new HashMap<>(); // Invited -> Inviter
     // Moved GroupCheck here so it persists and is accessible by the GUI later
     private HashMap<UUID, ArrayList<UUID>> groupCheck = new HashMap<>(); 
-    
+    private final List<UUID> disbandQueue = new ArrayList<>();
+    private final Set<UUID> clanChatToggled = new HashSet<>();
     private File clansFile;
     private FileConfiguration clansConfig;
     private SelectionManager selectionManager;
@@ -33,6 +37,7 @@ public class ClanTournament extends JavaPlugin {
         this.clanGUI = new ClanGUI(this);
         getServer().getPluginManager().registerEvents(this.clanGUI, this);
         getServer().getPluginManager().registerEvents(new ProtectionListener(this), this);
+        getServer().getPluginManager().registerEvents(new ClanChatListener(this), this);
         if (getCommand("clan") != null) {
             getCommand("clan").setExecutor(new ClanCommand(this));
         }
@@ -108,4 +113,6 @@ public class ClanTournament extends JavaPlugin {
     public HashMap<UUID, ArrayList<UUID>> getGroupCheck() { return groupCheck; }
     public SelectionManager getSelectionManager() { return selectionManager; }
     public ClanGUI getClanGUI() { return clanGUI; }
+    public List<UUID> getDisbandQueue() { return disbandQueue; }
+    public Set<UUID> getClanChatToggled() { return clanChatToggled; }
 }
