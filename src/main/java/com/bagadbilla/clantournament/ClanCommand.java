@@ -31,8 +31,8 @@ public class ClanCommand implements CommandExecutor {
             player.sendMessage("§e/clan leave §7- Leave your current clan/group");
             player.sendMessage("§e/clan kick <player> §7- Kick a member (Leader Only)");
             player.sendMessage("§e/clan disband §7- Delete clan (Leader only)");
-            player.sendMessage("§e/clan create <name> §7- Register (15 Diamonds + 5 members)");
-            player.sendMessage("§e/clan seemyclan §7- Open GUI");
+            player.sendMessage("§e/clan create <name> §7- Register (15 Diamonds + 3 members)");
+            player.sendMessage("§e/clan myclan §7- Open Detailed View of Clan");
             player.sendMessage("§e/clan pos1/pos2 §7- Set protection area");
             return true;
         }
@@ -104,9 +104,9 @@ public class ClanCommand implements CommandExecutor {
             if (plugin.getClanByPlayer(uuid) != null) { player.sendMessage("§cYou already have a clan!"); return true; }
 
             ArrayList<UUID> group = plugin.getGroupCheck().get(uuid);
-            // FIXED: Changed < 0 to < 4 because you need 5 people total (Leader + 4 members)
+            // FIXED: Changed < 0 to < 2 because you need 5 people total (Leader + 4 members)
             if (group == null || group.size() < 0) {  
-                player.sendMessage("§cYou need at least 5 members in your group (including you) to start a tournament clan!");
+                player.sendMessage("§cYou need at least 3 members in your group (including you) to start a tournament clan!");
                 return true;
             }
 
@@ -268,7 +268,7 @@ public class ClanCommand implements CommandExecutor {
         }
 
         // --- SEEMYCLAN ---
-        else if (args[0].equalsIgnoreCase("seemyclan")) {
+        else if (args[0].equalsIgnoreCase("myclan")) {
             Clan clan = plugin.getClanByPlayer(uuid);
             if (clan != null) plugin.getClanGUI().openClanMenu(player, clan);
             else player.sendMessage("§cYou don't have a clan yet.");

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.UUID;
+import org.bukkit.Bukkit;
 
 public class ClanTournament extends JavaPlugin {
 
@@ -43,6 +44,10 @@ public class ClanTournament extends JavaPlugin {
         }
 
         getLogger().info("Bagadbilla's Clan System Loaded Successfully!");
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new ClanPlaceholderExpansion(this).register();
+            getLogger().info("Successfully hooked into PlaceholderAPI!");
+        }
     }
 
     @Override
