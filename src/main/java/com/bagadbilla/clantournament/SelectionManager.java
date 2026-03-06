@@ -27,7 +27,7 @@ public class SelectionManager {
         Location loc = player.getLocation();
         if (pointNumber == 1) {
             clan.setPos1(loc);
-            player.sendMessage("§aPosition 1 set to: " + loc.getBlockX() + ", " + loc.getBlockZ());
+            player.sendMessage("§aYou can only choose your protected terrioty once, choose wisely | Position 1 set to: " + loc.getBlockX() + ", " + loc.getBlockZ());
         } else {
             clan.setPos2(loc);
             player.sendMessage("§aPosition 2 set to: " + loc.getBlockX() + ", " + loc.getBlockZ());
@@ -46,7 +46,7 @@ public class SelectionManager {
                 player.sendMessage("§c§lWARNING: §7Your selection is " + xDist + "x" + zDist);
                 player.sendMessage("§cThe limit is 100x100. Protection will NOT work until resized!");
             } else {
-                player.sendMessage("§b§lSUCCESS: §7Area is " + xDist + "x" + zDist + ". Data saved to VPS.");
+                player.sendMessage("§b§lSUCCESS: §7Area is " + xDist + "x" + zDist + ". Territory has been Set!.");
                 plugin.saveClansToDisk();
             }
         }

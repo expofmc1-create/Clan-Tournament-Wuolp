@@ -42,6 +42,7 @@ public class ClanCommand implements CommandExecutor {
             if (args.length < 2) { player.sendMessage("§cUsage: /clan invite <player>"); return true; }
             Player target = Bukkit.getPlayer(args[1]);
             if (target == null) { player.sendMessage("§cPlayer not found."); return true; }
+            if (target != null && target.getUniqueId().equals(player.getUniqueId())) { player.sendMessage("§cYou cannot invite yourself to your own clan!"); return true; }
 
             Clan myClan = plugin.getClanByPlayer(uuid);
             if (myClan != null && !myClan.getLeader().equals(uuid)) {
@@ -93,7 +94,7 @@ public class ClanCommand implements CommandExecutor {
                 player.sendMessage("§aJoined the group!");
                 
                 Player leader = Bukkit.getPlayer(inviterUUID);
-                if (leader != null) leader.sendMessage("§e" + player.getName() + " joined your group! (" + (group.size() + 1) + "/5)");
+                if (leader != null) leader.sendMessage("§e" + player.getName() + " joined your group! (" + (group.size() + 1) + "/3)");
             }
             return true;
         }
@@ -105,7 +106,7 @@ public class ClanCommand implements CommandExecutor {
 
             ArrayList<UUID> group = plugin.getGroupCheck().get(uuid);
             // FIXED: Changed < 0 to < 2 because you need 5 people total (Leader + 4 members)
-            if (group == null || group.size() < 0) {  
+            if (group == null || group.size() < 2) {  
                 player.sendMessage("§cYou need at least 3 members in your group (including you) to start a tournament clan!");
                 return true;
             }

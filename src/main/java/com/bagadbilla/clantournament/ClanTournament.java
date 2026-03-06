@@ -39,6 +39,7 @@ public class ClanTournament extends JavaPlugin {
         getServer().getPluginManager().registerEvents(this.clanGUI, this);
         getServer().getPluginManager().registerEvents(new ProtectionListener(this), this);
         getServer().getPluginManager().registerEvents(new ClanChatListener(this), this);
+        getServer().getPluginManager().registerEvents(new MissionsGUI(this), this);
         if (getCommand("clan") != null) {
             getCommand("clan").setExecutor(new ClanCommand(this));
         }

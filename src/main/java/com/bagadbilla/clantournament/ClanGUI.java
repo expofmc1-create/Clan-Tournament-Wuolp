@@ -18,7 +18,11 @@ import java.util.UUID;
 public class ClanGUI implements Listener {
 
     private final ClanTournament plugin;
-    public ClanGUI(ClanTournament plugin) { this.plugin = plugin; }
+    private final MissionsGUI missionsGUI;
+    public ClanGUI(ClanTournament plugin) {
+        this.plugin = plugin;
+        this.missionsGUI = new MissionsGUI(plugin);
+    }
 
     public void openClanMenu(Player player, Clan clan) {
         Inventory gui = Bukkit.createInventory(null, 54, "§8» §l" + clan.getName().toUpperCase());
@@ -106,6 +110,36 @@ public class ClanGUI implements Listener {
 	}
 	gui.setItem(11, vitals);
 
+        // Mission Button - Slot 12
+        ItemStack missions = new ItemStack(Material.BOOK);
+        ItemMeta mMeta = missions.getItemMeta();
+        if (mMeta != null) {
+            mMeta.setDisplayName("§6§lClan Missions");
+            List<String> mLore = new ArrayList<>();
+            mLore.add("§7Complete Missions to earn");
+            mLore.add("§7Earn points for §bRewards§7.");
+            mLore.add("");
+            mLore.add("§fProgress: §b" + clan.getPoints() + "/50"); // Using points as a placeholder
+            mLore.add("");
+            mLore.add("§eClick to view all missions!");
+            mMeta.setLore(mLore);
+            missions.setItemMeta(mMeta);
+        }
+        gui.setItem(12, missions);
+
+         // Chat_toogle - Slot 14
+        ItemStack chat = new ItemStack(Material.COMPARATOR);
+        ItemMeta cMeta = chat.getItemMeta();
+        if (cMeta != null) {
+            cMeta.setDisplayName("§6§lClan Chat");
+            List<String> cLore = new ArrayList<>();
+            cLore.add("");
+            cLore.add("§eClick to Toggle");
+            cMeta.setLore(cLore);
+            chat.setItemMeta(cMeta);
+        }
+        gui.setItem(14, chat);
+
         // --- 5. LEAVE BUTTON (Slot 53) ---
         // If leader, show barrier (can't leave). If member, show red bed.
         if (clan.getLeader().equals(player.getUniqueId())) {
@@ -169,6 +203,16 @@ public class ClanGUI implements Listener {
             else if (clickedType == Material.GLISTERING_MELON_SLICE) {
                 player.closeInventory();
                 player.performCommand("clan vitals");
+            }
+             else if (clickedType == Material.COMPARATOR) {
+                player.closeInventory();
+                player.performCommand("c chat");
+            }
+            else if (clickedType == Material.BOOK) {
+                Clan clan = plugin.getClanByPlayer(player.getUniqueId());
+                if (clan != null) {
+                    this.missionsGUI.openMissionsMenu(player, clan);
+                }
             }
         }
 
