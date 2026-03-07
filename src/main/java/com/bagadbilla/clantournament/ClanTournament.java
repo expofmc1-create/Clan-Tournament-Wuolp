@@ -40,9 +40,18 @@ public class ClanTournament extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ProtectionListener(this), this);
         getServer().getPluginManager().registerEvents(new ClanChatListener(this), this);
         getServer().getPluginManager().registerEvents(new MissionsGUI(this), this);
+        getServer().getPluginManager().registerEvents(new SubTaskGUI(this), this);
         if (getCommand("clan") != null) {
             getCommand("clan").setExecutor(new ClanCommand(this));
         }
+// Fix for mission 1: Give 10 points if territory is already set
+        for (Clan clan : clans.values()) {
+            if (clan.getPos1() != null && clan.getPoints() == 0) {
+                clan.setPoints(10);
+                getLogger().info("Mission Fixed: " + clan.getName() + " awarded 10 points for territory.");
+            }
+        }
+        saveClansToDisk(); // Save the fix to clans.yml
 
         getLogger().info("Bagadbilla's Clan System Loaded Successfully!");
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {

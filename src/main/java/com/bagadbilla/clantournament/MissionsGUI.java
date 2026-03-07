@@ -37,28 +37,33 @@ public class MissionsGUI implements Listener {
             }
         }
 
-        // --- MISSION 1: SLAYER ---
+        // Current progress check
+        int points = clan.getPoints();
+
+        // --- MISSION 1: SLAYER (Always Unlocked) ---
         gui.setItem(11, createMissionItem(
             Material.IRON_SWORD, 
-            "§b§lSlayer Mission", 
+            "§b§l[Tier I] Slayer", 
             "§7Kill 50 players in the arena.", 
-            clan.getPoints(), 50, "Points"
+            points, 50, "Points", true
         ));
 
-        // --- MISSION 2: EXPLORER ---
+        // --- MISSION 2: DOMINATOR (Unlocks at 50 points) ---
+        boolean tier2Unlocked = points >= 50;
         gui.setItem(13, createMissionItem(
-            Material.COMPASS, 
-            "§e§lDominator Mission", 
+            tier2Unlocked ? Material.COMPASS : Material.BARRIER, 
+            tier2Unlocked ? "§e§l[Tier II] Dominator" : "§c§lLocked: Tier II", 
             "§7Capture the central hill.", 
-            0, 1, "Capture"
+            points, 100, "Points", tier2Unlocked
         ));
 
-        // --- MISSION 3: WEALTH ---
+        // --- MISSION 3: WEALTH (Unlocks at 100 points) ---
+        boolean tier3Unlocked = points >= 100;
         gui.setItem(15, createMissionItem(
-            Material.GOLD_INGOT, 
-            "§a§lWealth Mission", 
+            tier3Unlocked ? Material.GOLD_INGOT : Material.BARRIER, 
+            tier3Unlocked ? "§a§l[Tier III] Wealth" : "§c§lLocked: Tier III", 
             "§7Collect 1,000 tournament coins.", 
-            0, 1000, "Coins"
+            points, 200, "Points", tier3Unlocked
         ));
 
         // --- BACK BUTTON ---
@@ -73,18 +78,26 @@ public class MissionsGUI implements Listener {
         player.openInventory(gui);
     }
 
-    private ItemStack createMissionItem(Material material, String name, String goal, int progress, int target, String unit) {
+    private ItemStack createMissionItem(Material material, String name, String goal, int progress, int target, String unit, boolean unlocked) {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             meta.setDisplayName(name);
             List<String> lore = new ArrayList<>();
-            lore.add(goal);
-            lore.add("");
-            lore.add("§fProgress: §b" + progress + "/" + target + " " + unit);
             
-            String bar = progress >= target ? "§a§lCOMPLETED" : "§eIn Progress...";
-            lore.add("§fStatus: " + bar);
+            if (unlocked) {
+                lore.add(goal);
+                lore.add("");
+                lore.add("§fProgress: §b" + progress + "/" + target + " " + unit);
+                
+                String status = progress >= target ? "§a§lCOMPLETED" : "§eIn Progress...";
+                lore.add("§fStatus: " + status);
+            } else {
+                lore.add("§7Complete the previous mission");
+                lore.add("§7to unlock this task.");
+                lore.add("");
+                lore.add("§cRequires 50 Clan Points");
+            }
             
             meta.setLore(lore);
             item.setItemMeta(meta);
@@ -95,10 +108,8 @@ public class MissionsGUI implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (event.getClickedInventory() == null) return;
-        
         String title = event.getView().getTitle();
         
-        // Use contains to bypass any bold/color formatting issues
         if (title.contains("CLAN MISSIONS")) {
             event.setCancelled(true);
             Player player = (Player) event.getWhoClicked();
@@ -106,10 +117,17 @@ public class MissionsGUI implements Listener {
 
             if (clicked == null || clicked.getType() == Material.AIR) return;
 
-            // Handle the Back Button
+// --- THE NEW PART: Opening Sub-Tasks ---
+            if (clicked.getType() == Material.IRON_SWORD) {
+                Clan clan = plugin.getClanByPlayer(player.getUniqueId());
+                if (clan != null) {
+                    // This opens the specific missions for the Bloodbath campaign
+                    new SubTaskGUI(plugin).openSlayerTasks(player, clan);
+                }
+            }
+
             if (clicked.getType() == Material.ARROW) {
                 player.closeInventory();
-                // Forces the main clan menu to open via the registered command
                 player.performCommand("c myclan"); 
             }
         }
