@@ -41,6 +41,7 @@ public class ClanTournament extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ClanChatListener(this), this);
         getServer().getPluginManager().registerEvents(new MissionsGUI(this), this);
         getServer().getPluginManager().registerEvents(new SubTaskGUI(this), this);
+        getServer().getPluginManager().registerEvents(new MissionListener(this), this);
         if (getCommand("clan") != null) {
             getCommand("clan").setExecutor(new ClanCommand(this));
         }
@@ -97,6 +98,15 @@ public class ClanTournament extends JavaPlugin {
             String path = "clans." + clan.getName();
             clansConfig.set(path + ".leader", clan.getLeader().toString());
             clansConfig.set(path + ".points", clan.getPoints());
+// --- NEW: SAVE MISSION DATA ---
+        clansConfig.set(path + ".mobKills", clan.getMobKills());
+        clansConfig.set(path + ".wardenKills", clan.getWardenKills()); // FIXED PLACE
+        // Convert Set<UUID> to List<String> so YAML can read it
+        List<String> uniqueKillList = clan.getUniqueKills().stream()
+                                          .map(UUID::toString)
+                                          .toList();
+        clansConfig.set(path + ".unique_kills", uniqueKillList);
+        // ------------------------------
             if (clan.getPos1() != null) clansConfig.set(path + ".pos1", clan.getPos1());
             if (clan.getPos2() != null) clansConfig.set(path + ".pos2", clan.getPos2());
             List<String> memberList = clan.getMembers().stream().map(UUID::toString).toList();
@@ -112,6 +122,15 @@ public class ClanTournament extends JavaPlugin {
             UUID leader = UUID.fromString(clansConfig.getString(path + ".leader"));
             Clan clan = new Clan(name, leader);
             clan.setPoints(clansConfig.getInt(path + ".points"));
+// --- NEW: LOAD MISSION DATA ---
+            clan.setMobKills(clansConfig.getInt(path + ".mobKills", 0)); // Default to 0 if not found
+            clan.setWardenKills(clansConfig.getInt(path + ".wardenKills", 0));
+        if (clansConfig.contains(path + ".unique_kills")) {
+            for (String s : clansConfig.getStringList(path + ".unique_kills")) {
+                clan.getUniqueKills().add(UUID.fromString(s));
+            }
+        }
+        // ------------------------------
             if (clansConfig.contains(path + ".pos1")) clan.setPos1(clansConfig.getLocation(path + ".pos1"));
             if (clansConfig.contains(path + ".pos2")) clan.setPos2(clansConfig.getLocation(path + ".pos2"));
             if (clansConfig.contains(path + ".members")) {

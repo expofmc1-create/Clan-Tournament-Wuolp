@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class MissionsGUI implements Listener {
 
@@ -43,17 +44,17 @@ public class MissionsGUI implements Listener {
         // --- MISSION 1: SLAYER (Always Unlocked) ---
         gui.setItem(11, createMissionItem(
             Material.IRON_SWORD, 
-            "§b§l[Tier I] Slayer", 
-            "§7Kill 50 players in the arena.", 
-            points, 50, "Points", true
+            "§b§l[Chapter I] Slayer", 
+            "§7Swing your Sword or Die!.", 
+            points, 75, "Points", true
         ));
 
         // --- MISSION 2: DOMINATOR (Unlocks at 50 points) ---
         boolean tier2Unlocked = points >= 50;
         gui.setItem(13, createMissionItem(
             tier2Unlocked ? Material.COMPASS : Material.BARRIER, 
-            tier2Unlocked ? "§e§l[Tier II] Dominator" : "§c§lLocked: Tier II", 
-            "§7Capture the central hill.", 
+            tier2Unlocked ? "§e§l[Chapter II] Dominator" : "§c§lLocked: Tier II", 
+            "§7Conflict and War", 
             points, 100, "Points", tier2Unlocked
         ));
 
@@ -62,7 +63,7 @@ public class MissionsGUI implements Listener {
         gui.setItem(15, createMissionItem(
             tier3Unlocked ? Material.GOLD_INGOT : Material.BARRIER, 
             tier3Unlocked ? "§a§l[Tier III] Wealth" : "§c§lLocked: Tier III", 
-            "§7Collect 1,000 tournament coins.", 
+            "§7Rich and Poor.", 
             points, 200, "Points", tier3Unlocked
         ));
 
@@ -95,8 +96,6 @@ public class MissionsGUI implements Listener {
             } else {
                 lore.add("§7Complete the previous mission");
                 lore.add("§7to unlock this task.");
-                lore.add("");
-                lore.add("§cRequires 50 Clan Points");
             }
             
             meta.setLore(lore);

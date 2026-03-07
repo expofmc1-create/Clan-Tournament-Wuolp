@@ -36,13 +36,15 @@ public class SubTaskGUI implements Listener {
 
         // --- TASK 2: TENSION RISING ---
         // For now, using placeholders for progress; we will need to store these in the Clan object later
-        gui.setItem(13, createTask(Material.IRON_SWORD, "§e§lTask II: Tension Rising", 
-            "§7Kill 4 players of other clans.", 0, 4, 20, false));
-
+        int mobProg = clan.getMobKills();
+        boolean t2Done = mobProg >= 120;
+        gui.setItem(13, createTask(Material.ZOMBIE_HEAD, "§e§lTask II: Warrior Clan",
+            "§7Kill 120 Hostile Mobs collectively.", mobProg, 120, 20, t2Done));
         // --- TASK 3: TOTAL WAR ---
-        gui.setItem(15, createTask(Material.NETHERITE_AXE, "§c§lTask III: Total War", 
-            "§715 Unique kills against rivals.", 0, 15, 45, false));
-
+        int wardenProg = clan.getWardenKills();
+        boolean t3Done = wardenProg >= 5;
+        gui.setItem(15, createTask(Material.NETHERITE_AXE, "§c§lTask III: Warden Slayer",
+            "§7Slay 5 Wardens collectively.", wardenProg, 5, 45, t3Done));
         // Back Button
         ItemStack back = new ItemStack(Material.ARROW);
         ItemMeta bMeta = back.getItemMeta();

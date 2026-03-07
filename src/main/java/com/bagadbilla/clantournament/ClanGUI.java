@@ -119,7 +119,7 @@ public class ClanGUI implements Listener {
             mLore.add("§7Complete Missions to earn");
             mLore.add("§7Earn points for §bRewards§7.");
             mLore.add("");
-            mLore.add("§fProgress: §b" + clan.getPoints() + "/50"); // Using points as a placeholder
+            mLore.add("§fProgress: §b" + clan.getPoints() + "/500"); // Using points as a placeholder
             mLore.add("");
             mLore.add("§eClick to view all missions!");
             mMeta.setLore(mLore);
