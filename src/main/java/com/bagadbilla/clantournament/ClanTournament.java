@@ -42,6 +42,7 @@ public class ClanTournament extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new MissionsGUI(this), this);
         getServer().getPluginManager().registerEvents(new SubTaskGUI(this), this);
         getServer().getPluginManager().registerEvents(new MissionListener(this), this);
+        getServer().getPluginManager().registerEvents(new DominatorGUI(this), this);
         if (getCommand("clan") != null) {
             getCommand("clan").setExecutor(new ClanCommand(this));
         }
@@ -101,6 +102,7 @@ public class ClanTournament extends JavaPlugin {
 // --- NEW: SAVE MISSION DATA ---
         clansConfig.set(path + ".mobKills", clan.getMobKills());
         clansConfig.set(path + ".wardenKills", clan.getWardenKills()); // FIXED PLACE
+        clansConfig.set(path + ".witherSkulls", clan.getWitherSkullsFound());
         // Convert Set<UUID> to List<String> so YAML can read it
         List<String> uniqueKillList = clan.getUniqueKills().stream()
                                           .map(UUID::toString)
@@ -125,6 +127,8 @@ public class ClanTournament extends JavaPlugin {
 // --- NEW: LOAD MISSION DATA ---
             clan.setMobKills(clansConfig.getInt(path + ".mobKills", 0)); // Default to 0 if not found
             clan.setWardenKills(clansConfig.getInt(path + ".wardenKills", 0));
+ // cool load withe =head
+            clan.setWitherSkullsFound(clansConfig.getInt(path + ".witherSkulls", 0));
         if (clansConfig.contains(path + ".unique_kills")) {
             for (String s : clansConfig.getStringList(path + ".unique_kills")) {
                 clan.getUniqueKills().add(UUID.fromString(s));

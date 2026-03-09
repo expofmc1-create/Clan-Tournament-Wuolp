@@ -6,6 +6,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import java.util.UUID;
+import org.bukkit.Material;
+import org.bukkit.Bukkit;
 
 public class MissionListener implements Listener {
 
@@ -77,6 +79,44 @@ public class MissionListener implements Listener {
                         }
                     
                         plugin.saveClansToDisk();
+                    }
+                }
+            }
+        }
+    }
+    @EventHandler
+    public void onWitherSkeletonKill(EntityDeathEvent event) {
+        if (event.getEntityType() == EntityType.WITHER_SKELETON) {
+            Player killer = event.getEntity().getKiller();
+        
+            if (killer != null) {
+                Clan clan = plugin.getClanByPlayer(killer.getUniqueId());
+            
+                if (clan != null) {
+                // Check if a Wither Skeleton Skull dropped in the loot
+                    boolean droppedSkull = event.getDrops().stream()
+                            .anyMatch(item -> item.getType() == Material.WITHER_SKELETON_SKULL);
+
+                    if (droppedSkull) {
+                        if (clan.getWitherSkullsFound() < 8) {
+                            clan.addWitherSkull();
+                        
+                        // Notify the whole clan!
+                            for (UUID memberUUID : clan.getMembers()) {
+                                 Player member = Bukkit.getPlayer(memberUUID);
+                                 if (member != null && member.isOnline()) {
+                                     member.sendMessage("§8» §6§lRARE DROP! §e" + killer.getName() + " §ffound a Wither Skull! §7(" + clan.getWitherSkullsFound() + "/8)");
+                                 }
+                            }
+
+                        // Reward: Let's say 25 points for this task
+                            if (clan.getWitherSkullsFound() == 8) {
+                                clan.setPoints(clan.getPoints() + 45);
+                                killer.sendMessage("§a§lMISSION COMPLETE! §fYour clan earned §e45 Points§f.");
+                            }
+                        
+                            plugin.saveClansToDisk();
+                        }
                     }
                 }
             }

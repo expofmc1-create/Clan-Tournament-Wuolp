@@ -125,6 +125,18 @@ public class MissionsGUI implements Listener {
                 }
             }
 
+            // --- OPEN CHAPTER 2 SUB-TASKS ---
+            if (clicked.getType() == Material.COMPASS) {
+                Clan clan = plugin.getClanByPlayer(player.getUniqueId());
+                if (clan != null) {
+                    if (clan.getPoints() >= 50) {
+                        new DominatorGUI(plugin).openDominatorTasks(player, clan);
+                    } else {
+                        player.sendMessage("§cYou need 50 points to unlock Chapter II!");
+                    }
+                }
+           }
+
             if (clicked.getType() == Material.ARROW) {
                 player.closeInventory();
                 player.performCommand("c myclan"); 

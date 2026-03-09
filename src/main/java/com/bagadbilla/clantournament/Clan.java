@@ -16,6 +16,7 @@ public class Clan {
 // --- NEW: Mission Progress Tracking ---
     private int mobKills = 0; 
     private Set<UUID> uniqueKills = new HashSet<>();
+    private int witherSkullsFound = 0;
 
     public Clan(String name, UUID leader) {
         this.name = name;
@@ -50,4 +51,7 @@ public class Clan {
     public int getWardenKills() { return wardenKills; }
     public void setWardenKills(int kills) { this.wardenKills = kills; }
     public void addWardenKill() { this.wardenKills++; }
+    public int getWitherSkullsFound() { return witherSkullsFound; }
+    public void setWitherSkullsFound(int count) { this.witherSkullsFound = count; }
+    public void addWitherSkull() { this.witherSkullsFound++; }
 }
