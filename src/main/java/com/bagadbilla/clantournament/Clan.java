@@ -11,15 +11,18 @@ public class Clan {
     private HashSet<UUID> members = new HashSet<>();
     private int points = 0;
     private int wardenKills = 0;
-    private Location pos1, pos2;
+    private int blazeKills = 0;
+    private int witherSkeletonKills = 0;
+    private int debrisMined = 0;
     private int leaderLives = 5;
+    private Location pos1, pos2;
 // --- NEW: Mission Progress Tracking ---
     private int mobKills = 0; 
     private Set<UUID> uniqueKills = new HashSet<>();
     private int witherSkullsFound = 0;
     private Set<UUID> uniqueChapter2Kills = new HashSet<>(); //exp
     public Set<UUID> getUniqueChapter2Kills() { return uniqueChapter2Kills; } // exp
-
+    private boolean mission5Done = false;
     public Clan(String name, UUID leader) {
         this.name = name;
         this.leader = leader;
@@ -59,4 +62,16 @@ public class Clan {
     public int getLeaderLives() { return leaderLives; }
     public void setLeaderLives(int lives) { this.leaderLives = lives; }
     public void removeLeaderLife() { this.leaderLives--; }
+    public int getBlazeKills() { return blazeKills; }
+    public void addBlazeKill() { this.blazeKills++; }
+    public int getWitherSkeletonKills() { return witherSkeletonKills; }
+    public void addWitherSkeletonKill() { this.witherSkeletonKills++; }
+    public int getDebrisMined() { return debrisMined; }
+    public void addDebrisMined() { this.debrisMined++; }
+    public boolean isMission5Done() { return mission5Done; }
+    public void setMission5Done(boolean done) { this.mission5Done = done; }
+    public void setBlazeKills(int kills) { this.blazeKills = kills; }
+    public void setWitherSkeletonKills(int kills) { this.witherSkeletonKills = kills; }
+    public void setDebrisMined(int count) { this.debrisMined = count; }
 }
+

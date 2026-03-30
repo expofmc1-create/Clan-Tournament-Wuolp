@@ -9,6 +9,9 @@ import java.util.UUID;
 import org.bukkit.Material;
 import org.bukkit.Bukkit;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.metadata.FixedMetadataValue;
 
 public class MissionListener implements Listener {
 
@@ -160,6 +163,8 @@ public class MissionListener implements Listener {
                     
                         plugin.saveClansToDisk();
                     }
+                } else {
+                    killer.sendMessage("§c§l(!) §7You already killed " + victim.getName() + "! Go find someone else.");
                 }
             }
         }
@@ -221,5 +226,76 @@ public class MissionListener implements Listener {
     
        plugin.saveClansToDisk();
    }
+//-------3 functions--mission 5 and 6 ---------
+  @EventHandler
+  public void onEliteMobKill(EntityDeathEvent event) {
+      Player killer = event.getEntity().getKiller();
+      if (killer == null) return;
+
+      Clan clan = plugin.getClanByPlayer(killer.getUniqueId());
+      if (clan == null) return;
+
+      EntityType type = event.getEntityType();
+
+    // Mission 5: The Fortress Siege
+      if (type == EntityType.WITHER_SKELETON) {
+          if (clan.getWitherSkeletonKills() < 50) {
+              clan.addWitherSkeletonKill();
+              checkMissionComplete(killer, clan, "Wither Skeletons", clan.getWitherSkeletonKills(), 50);
+          }
+      } else if (type == EntityType.BLAZE) {
+          if (clan.getBlazeKills() < 35) {
+              clan.addBlazeKill();
+              checkMissionComplete(killer, clan, "Blazes", clan.getBlazeKills(), 35);
+          }
+      }
+  }
+
+  @EventHandler
+  public void onDebrisPlace(BlockPlaceEvent event) {
+      if (event.getBlock().getType() == Material.ANCIENT_DEBRIS) {
+        // Tag the block so these fuckass cant glitch to get infinite points
+          event.getBlock().setMetadata("placed_by_player", new FixedMetadataValue(plugin, true));
+      }
+  }
+
+  @EventHandler
+  public void onDebrisMine(BlockBreakEvent event) {
+      Player player = event.getPlayer();
+      if (event.getBlock().getType() != Material.ANCIENT_DEBRIS) return;
+
+    if (event.getBlock().hasMetadata("placed_by_player")) {
+        event.getPlayer().sendMessage("§c§l(!) §7Nice try, but you can't farm placed Debris!");
+        return;
+    }
+
+      Clan clan = plugin.getClanByPlayer(player.getUniqueId());
+      if (clan == null) return;
+
+    // Mission 6: Ancient Power
+      if (clan.getDebrisMined() < 12) {
+          clan.addDebrisMined();
+          player.sendMessage("§8» §6§lMINED! §fAncient Debris found (§e" + clan.getDebrisMined() + "§7/12)");
+        
+          if (clan.getDebrisMined() == 12) {
+              clan.setPoints(clan.getPoints() + 75); // Big reward for Netherite
+              Bukkit.broadcastMessage("§8» §b§lMISSION COMPLETE: §fClan §6" + clan.getName() + " §fhas mastered Ancient Debris!");
+          }
+      }
+  }
+
+// Helper to keep code clean
+  private void checkMissionComplete(Player p, Clan clan, String mob, int current, int goal) {
+      if (current % 10 == 0 || current == goal) {
+          p.sendMessage("§8» §6§lMISSION: §f" + mob + " (§e" + current + "§7/" + goal + ")");
+      }
+    
+    // Check if both parts of Mission 5 are done
+      if (clan.getWitherSkeletonKills() >= 50 && clan.getBlazeKills() >= 35 && !clan.isMission5Done()) {
+          clan.setPoints(clan.getPoints() + 50);
+          clan.setMission5Done(true); // You'll need this boolean in Clan.java
+          Bukkit.broadcastMessage("§8» §b§lCHAPTER 2: §fClan §6" + clan.getName() + " §fhas conquered the Nether Fortress!");
+      }
+  }
 }
 

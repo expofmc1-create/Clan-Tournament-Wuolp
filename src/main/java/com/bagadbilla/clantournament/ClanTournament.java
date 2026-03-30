@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.UUID;
 import org.bukkit.Bukkit;
 
 public class ClanTournament extends JavaPlugin {
@@ -104,8 +103,12 @@ public class ClanTournament extends JavaPlugin {
         clansConfig.set(path + ".wardenKills", clan.getWardenKills()); // FIXED PLACE
         clansConfig.set(path + ".witherSkulls", clan.getWitherSkullsFound());
         clansConfig.set(path + ".leaderLives", clan.getLeaderLives());
+        clansConfig.set(path + ".blazeKills", clan.getBlazeKills());
+        clansConfig.set(path + ".witherSkeletonKills", clan.getWitherSkeletonKills());
+        clansConfig.set(path + ".debrisMined", clan.getDebrisMined());
         List<String> ch2Kills = clan.getUniqueChapter2Kills().stream().map(UUID::toString).toList();
         clansConfig.set(path + ".ch2_unique_kills", ch2Kills);
+        clansConfig.set(path + ".mission5Done", clan.isMission5Done());
         // Convert Set<UUID> to List<String> so YAML can read it
         List<String> uniqueKillList = clan.getUniqueKills().stream()
                                           .map(UUID::toString)
@@ -131,6 +134,10 @@ public class ClanTournament extends JavaPlugin {
             clan.setMobKills(clansConfig.getInt(path + ".mobKills", 0)); // Default to 0 if not found
             clan.setWardenKills(clansConfig.getInt(path + ".wardenKills", 0));
             clan.setLeaderLives(clansConfig.getInt(path + ".leaderLives", 5)); 
+            clan.setBlazeKills(clansConfig.getInt(path + ".blazeKills", 0));
+            clan.setWitherSkeletonKills(clansConfig.getInt(path + ".witherSkeletonKills", 0));
+            clan.setDebrisMined(clansConfig.getInt(path + ".debrisMined", 0));
+            clan.setMission5Done(clansConfig.getBoolean(path + ".mission5Done", false));
 // cool load withe =head
             clan.setWitherSkullsFound(clansConfig.getInt(path + ".witherSkulls", 0));
         if (clansConfig.contains(path + ".unique_kills")) {
