@@ -33,11 +33,13 @@ public class DominatorGUI implements Listener {
         int skullProg = clan.getWitherSkullsFound();
         boolean t1Done = skullProg >= 8;
         gui.setItem(11, createTask(Material.WITHER_SKELETON_SKULL, "§6§lTask I: The Dark Collection", 
-            "§7Loot skulls from Wither Skeletons.", skullProg, 8, 25, t1Done));
+            "§7Loot skulls from Wither Skeletons.", skullProg, 8, 45, t1Done));
 
         // --- TASK 2: Placeholder for now ---
-        gui.setItem(13, createTask(Material.SOUL_SAND, "§e§lTask II: Coming Soon", 
-            "§7Unlock in next update.", 0, 1, 35, false));
+        int pvpProg = clan.getUniqueChapter2Kills().size();
+        boolean t2Done = pvpProg >= 10;
+        gui.setItem(13, createTask(Material.NETHERITE_SWORD, "§c§lTask II: Rival Extinction",
+            "§7Slay 10 unique rival clan members.", pvpProg, 10, 65, t2Done));
 
         // Back Button
         ItemStack back = new ItemStack(Material.ARROW);

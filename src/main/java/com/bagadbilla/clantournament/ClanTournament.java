@@ -103,6 +103,9 @@ public class ClanTournament extends JavaPlugin {
         clansConfig.set(path + ".mobKills", clan.getMobKills());
         clansConfig.set(path + ".wardenKills", clan.getWardenKills()); // FIXED PLACE
         clansConfig.set(path + ".witherSkulls", clan.getWitherSkullsFound());
+        clansConfig.set(path + ".leaderLives", clan.getLeaderLives());
+        List<String> ch2Kills = clan.getUniqueChapter2Kills().stream().map(UUID::toString).toList();
+        clansConfig.set(path + ".ch2_unique_kills", ch2Kills);
         // Convert Set<UUID> to List<String> so YAML can read it
         List<String> uniqueKillList = clan.getUniqueKills().stream()
                                           .map(UUID::toString)
@@ -127,11 +130,18 @@ public class ClanTournament extends JavaPlugin {
 // --- NEW: LOAD MISSION DATA ---
             clan.setMobKills(clansConfig.getInt(path + ".mobKills", 0)); // Default to 0 if not found
             clan.setWardenKills(clansConfig.getInt(path + ".wardenKills", 0));
- // cool load withe =head
+            clan.setLeaderLives(clansConfig.getInt(path + ".leaderLives", 5)); 
+// cool load withe =head
             clan.setWitherSkullsFound(clansConfig.getInt(path + ".witherSkulls", 0));
         if (clansConfig.contains(path + ".unique_kills")) {
             for (String s : clansConfig.getStringList(path + ".unique_kills")) {
                 clan.getUniqueKills().add(UUID.fromString(s));
+            }
+        }
+        // this if statemnt might work or might not this one is the um the player killun goe ch 2
+        if (clansConfig.contains(path + ".ch2_unique_kills")) {
+            for (String s : clansConfig.getStringList(path + ".ch2_unique_kills")) {
+                clan.getUniqueChapter2Kills().add(UUID.fromString(s));
             }
         }
         // ------------------------------
@@ -153,4 +163,12 @@ public class ClanTournament extends JavaPlugin {
     public ClanGUI getClanGUI() { return clanGUI; }
     public List<UUID> getDisbandQueue() { return disbandQueue; }
     public Set<UUID> getClanChatToggled() { return clanChatToggled; }
+  // -----------add the getter above i am putting the methods down here noe 
+
+    public List<Clan> getSortedClans() {
+       List<Clan> sortedClans = new ArrayList<>(clans.values());
+    // Sorts descending (Highest points first)
+       sortedClans.sort((c1, c2) -> Integer.compare(c2.getPoints(), c1.getPoints()));
+       return sortedClans;
+    }
 }

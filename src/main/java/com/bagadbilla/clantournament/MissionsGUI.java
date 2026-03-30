@@ -89,7 +89,6 @@ public class MissionsGUI implements Listener {
             if (unlocked) {
                 lore.add(goal);
                 lore.add("");
-                lore.add("§fProgress: §b" + progress + "/" + target + " " + unit);
                 
                 String status = progress >= target ? "§a§lCOMPLETED" : "§eIn Progress...";
                 lore.add("§fStatus: " + status);

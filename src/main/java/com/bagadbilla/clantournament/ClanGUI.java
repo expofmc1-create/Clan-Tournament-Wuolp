@@ -139,6 +139,37 @@ public class ClanGUI implements Listener {
             chat.setItemMeta(cMeta);
         }
         gui.setItem(14, chat);
+      // - Leader Sot 
+        ItemStack leaderLife = new ItemStack(Material.TOTEM_OF_UNDYING);
+        ItemMeta lMeta = leaderLife.getItemMeta();
+        if (lMeta != null) {
+            lMeta.setDisplayName("§6§lLEADER VITALITY");
+            List<String> lLore = new ArrayList<>();
+    
+    // Get the leader's name
+            String leaderName = Bukkit.getOfflinePlayer(clan.getLeader()).getName();
+    
+            lLore.add("§7Leader: §f" + leaderName);
+            lLore.add("");
+    
+    // Logic for Hardcore vs Normal
+            if (Bukkit.getWorlds().get(0).isHardcore()) {
+                lLore.add("§c§lMODE: HARDCORE");
+                lLore.add("§7Status: §4§lONE LIFE REMAINING");
+                lLore.add("§7(One death = Clan Wipe)");
+            } else {
+                int lives = clan.getLeaderLives();
+                String color = (lives > 2) ? "§a" : "§c"; // Green if safe, Red if low
+
+                lLore.add("§fRemaining Lives: " + color + lives + "§7/5");
+                lLore.add("");
+                lLore.add("§eProtect your leader at all costs!");
+           }
+    
+           lMeta.setLore(lLore);
+           leaderLife.setItemMeta(lMeta);
+        }
+        gui.setItem(4, leaderLife); 
 
         // --- 5. LEAVE BUTTON (Slot 53) ---
         // If leader, show barrier (can't leave). If member, show red bed.
@@ -165,6 +196,7 @@ public class ClanGUI implements Listener {
 
         player.openInventory(gui);
     }
+
 
     // --- NEW: CONFIRMATION MENU ---
     public void openConfirmMenu(Player player) {

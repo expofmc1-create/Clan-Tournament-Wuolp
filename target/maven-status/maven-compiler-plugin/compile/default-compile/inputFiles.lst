@@ -1,11 +1,12 @@
-/home/ubuntu/ClanTournament/src/main/java/com/bagadbilla/clantournament/ClanChatListener.java
-/home/ubuntu/ClanTournament/src/main/java/com/bagadbilla/clantournament/SelectionManager.java
 /home/ubuntu/ClanTournament/src/main/java/com/bagadbilla/clantournament/Clan.java
-/home/ubuntu/ClanTournament/src/main/java/com/bagadbilla/clantournament/MissionListener.java
 /home/ubuntu/ClanTournament/src/main/java/com/bagadbilla/clantournament/DominatorGUI.java
 /home/ubuntu/ClanTournament/src/main/java/com/bagadbilla/clantournament/SubTaskGUI.java
-/home/ubuntu/ClanTournament/src/main/java/com/bagadbilla/clantournament/ClanCommand.java
 /home/ubuntu/ClanTournament/src/main/java/com/bagadbilla/clantournament/ProtectionListener.java
+/home/ubuntu/ClanTournament/src/main/java/com/bagadbilla/clantournament/LeaderboardGUI.java
+/home/ubuntu/ClanTournament/src/main/java/com/bagadbilla/clantournament/ClanChatListener.java
+/home/ubuntu/ClanTournament/src/main/java/com/bagadbilla/clantournament/SelectionManager.java
+/home/ubuntu/ClanTournament/src/main/java/com/bagadbilla/clantournament/MissionListener.java
+/home/ubuntu/ClanTournament/src/main/java/com/bagadbilla/clantournament/ClanCommand.java
 /home/ubuntu/ClanTournament/src/main/java/com/bagadbilla/clantournament/MissionsGUI.java
 /home/ubuntu/ClanTournament/src/main/java/com/bagadbilla/clantournament/ClanPlaceholderExpansion.java
 /home/ubuntu/ClanTournament/src/main/java/com/bagadbilla/clantournament/ClanTournament.java

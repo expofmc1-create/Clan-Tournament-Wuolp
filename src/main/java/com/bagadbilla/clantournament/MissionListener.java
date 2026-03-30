@@ -8,6 +8,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import java.util.UUID;
 import org.bukkit.Material;
 import org.bukkit.Bukkit;
+import org.bukkit.event.entity.PlayerDeathEvent;
 
 public class MissionListener implements Listener {
 
@@ -122,4 +123,103 @@ public class MissionListener implements Listener {
             }
         }
     }
+    @EventHandler
+    public void onPlayerKill(PlayerDeathEvent event) {
+        Player victim = event.getEntity();
+        Player killer = victim.getKiller();
+
+        if (killer != null && !killer.getUniqueId().equals(victim.getUniqueId())) {
+            Clan killerClan = plugin.getClanByPlayer(killer.getUniqueId());
+            Clan victimClan = plugin.getClanByPlayer(victim.getUniqueId());
+
+        // 1. Both must be in clans
+        // 2. Must be DIFFERENT clans
+            if (killerClan != null && victimClan != null && !killerClan.getName().equals(victimClan.getName())) {
+            
+            // 3. Check if this victim has already been counted for this chapter
+                if (!killerClan.getUniqueChapter2Kills().contains(victim.getUniqueId())) {
+                
+                    if (killerClan.getUniqueChapter2Kills().size() < 10) {
+                        killerClan.getUniqueChapter2Kills().add(victim.getUniqueId());
+                    
+                        int currentKills = killerClan.getUniqueChapter2Kills().size();
+                    
+                    // Notify Clan
+                        for (UUID memberUUID : killerClan.getMembers()) {
+                            Player member = Bukkit.getPlayer(memberUUID);
+                            if (member != null && member.isOnline()) {
+                                member.sendMessage("§c§lDOMINATOR §8» §e" + killer.getName() + " §fslayed §n" + victim.getName() + "§f! §7(" + currentKills + "/10)");
+                            }
+                        }
+
+                    // MISSION COMPLETE: 65 POINTS
+                        if (currentKills == 10) {
+                            killerClan.setPoints(killerClan.getPoints() + 65);
+                            Bukkit.broadcastMessage("§6§lCLAN WARS §8» §eClan §l" + killerClan.getName() + " §fhas completed the §cDominator §fChapter!");
+                        }
+                    
+                        plugin.saveClansToDisk();
+                    }
+                }
+            }
+        }
+    }
+// CLan Destroying stuff ------------
+// dont fking argue why is this in mission listener it just is shut up
+   @EventHandler
+   public void onLeaderDeath(PlayerDeathEvent event) {
+       Player victim = event.getEntity();
+       Player killer = victim.getKiller();
+       Clan victimClan = plugin.getClanByPlayer(victim.getUniqueId());
+
+    // Only proceed if the victim is a Leader
+       if (victimClan != null && victimClan.getLeader().equals(victim.getUniqueId())) {
+        
+        // Check if server is in Hardcore mode OR if lives hit 0
+           boolean isHardcore = Bukkit.getWorlds().get(0).isHardcore();
+        
+           if (isHardcore || victimClan.getLeaderLives() <= 1) {
+            // --- CLAN DESTRUCTION LOGIC ---
+               if (killer != null) {
+                   Clan killerClan = plugin.getClanByPlayer(killer.getUniqueId());
+                   if (killerClan != null) {
+                       executeClanWipe(victimClan, killerClan);
+                   } else {
+                       executeClanWipe(victimClan, null); // Killed by a mob/world
+                   }
+               } else {
+                   executeClanWipe(victimClan, null);
+               }
+           } else {
+            // Just lose a life
+               victimClan.removeLeaderLife();
+               victim.sendMessage("§c§lWARNING §8» §fYou lost a life! Lives remaining: §e" + victimClan.getLeaderLives());
+               plugin.saveClansToDisk();
+           }
+       }
+   }
+
+   private void executeClanWipe(Clan loser, Clan winner) {
+       int pointsToSteal = loser.getPoints() / 2;
+
+       if (winner != null) {
+           winner.setPoints(winner.getPoints() + pointsToSteal);
+           Bukkit.broadcastMessage("§8» §6§lCLAN WIPE: §b" + winner.getName() + " §fhas eliminated §c" + loser.getName() + "§f!");
+           Bukkit.broadcastMessage("§8» §e+" + pointsToSteal + " Points §fstolen from the fallen.");
+       } else {
+           Bukkit.broadcastMessage("§8» §6§lCLAN WIPE: §c" + loser.getName() + " §fhas fallen to the world!");
+       }
+
+    // Completely remove the clan
+       plugin.getClans().remove(loser.getName().toLowerCase());
+    
+    // Kick members out of the clan in-game (Optional: message them)
+       for (UUID memberUUID : loser.getMembers()) {
+           Player p = Bukkit.getPlayer(memberUUID);
+           if (p != null) p.sendMessage("§c§lYour clan has been destroyed. You are now a nomad.");
+       }
+    
+       plugin.saveClansToDisk();
+   }
 }
+

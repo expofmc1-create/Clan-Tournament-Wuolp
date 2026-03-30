@@ -33,6 +33,7 @@ public class ClanCommand implements CommandExecutor {
             player.sendMessage("§e/clan disband §7- Delete clan (Leader only)");
             player.sendMessage("§e/clan create <name> §7- Register (15 Diamonds + 3 members)");
             player.sendMessage("§e/clan myclan §7- Open Detailed View of Clan");
+            player.sendMessage("§e/clan top §7- Opens Leaderboard");
             player.sendMessage("§e/clan pos1/pos2 §7- Set protection area");
             return true;
         }
@@ -265,6 +266,11 @@ public class ClanCommand implements CommandExecutor {
                     player.sendMessage("§7- §8" + Bukkit.getOfflinePlayer(memberId).getName() + " §7(Offline)");
                 }
             }
+            return true;
+        }
+        // -- clan leaderboard ---
+        else if (args[0].equalsIgnoreCase("top")) {
+            new LeaderboardGUI(plugin).openLeaderboard(player);
             return true;
         }
 

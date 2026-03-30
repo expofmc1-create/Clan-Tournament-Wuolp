@@ -1,5 +1,6 @@
 com/bagadbilla/clantournament/SubTaskGUI.class
 com/bagadbilla/clantournament/Clan.class
+com/bagadbilla/clantournament/LeaderboardGUI.class
 com/bagadbilla/clantournament/MissionListener.class
 com/bagadbilla/clantournament/ClanPlaceholderExpansion.class
 com/bagadbilla/clantournament/ClanGUI.class
